@@ -28,7 +28,7 @@ Example of what you can achieve:
 
 Code used to configure the example:
 ```yaml
-type: custom:reinier-custom-card
+type: custom:home-overview
 title: null
 rows: 3
 columns: 9
