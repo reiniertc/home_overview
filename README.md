@@ -186,8 +186,8 @@ cells:
 ```
 
 ## Configruation of the table
-```title```: Title of the card. Can be omitted if you don't want a title
-```rows```: Number of rows to be displayed
-```columns```: Number of columns to be displayed
-```font-size```: Font-size (optional). 1 = normal size, 0.5 = 50% etc
+```title```: Title of the card. Can be omitted if you don't want a title<br>
+```rows```: Number of rows to be displayed<br>
+```columns```: Number of columns to be displayed<br>
+```font-size```: Font-size (optional). 1 = normal size, 0.5 = 50% etc<br>
 ## Configuration of a cell
