@@ -13,3 +13,15 @@ resources:
  - url: /hacsfiles/home_overview/home_overview.js
  type: module
 ```
+
+```
+type: 'custom:home_overview'
+title: 'Mijn Kaart Titel'
+rows: 2
+columns: 2
+cell_spacing_vertical: '5px'
+cell_spacing_horizontal: '5px'
+cells:
+  - [cell_config_1, cell_config_2]
+  - [cell_config_3, cell_config_4]
+```
