@@ -185,7 +185,7 @@ cells:
           entity_id: light.veranda
 ```
 
-## Configruation of the table
+## Configuration of the table
 ```title```: Title of the card. Can be omitted if you don't want a title<br>
 ```rows```: Number of rows to be displayed<br>
 ```columns```: Number of columns to be displayed<br>
@@ -197,6 +197,6 @@ cells:
 ```cell_spacing_horizontal:``` spacing between rows in px<br>
 
 ## Configuration of a cell
-Configuration of the cells start with ```cells:```. Make sure that you configure the exact number of rows and colums that you defined.
+Configuration of the cells start with ```cells:```. Make sure that you configure the exact number of rows and colums that you defined.<br>
 Each cell can show a background image (based on the current playing song of the media_entity), a background-color (based on the light status of the ```light_entity```) and 3 lines of text (Title, temperature of the ```climate_entity``` and value of the ```sensor_entity```)
 
