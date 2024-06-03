@@ -1,5 +1,5 @@
 # home_overview
-A complete overview of every room in your house in a single card
+A complete overview of every room in your house in a single card in home assistant
 
 This is a custom component with the goal of providing you an overview of you entire house in one card. 
 It allows you to define a table with a single or multiple columns and rows.
