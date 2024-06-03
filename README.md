@@ -198,5 +198,12 @@ cells:
 
 ## Configuration of a cell
 Configuration of the cells start with ```cells:```. Make sure that you configure the exact number of rows and colums that you defined.<br>
-Each cell can show a background image (based on the current playing song of the media_entity), a background-color (based on the light status of the ```light_entity```) and 3 lines of text (Title, temperature of the ```climate_entity``` and value of the ```sensor_entity```)
+Each cell can show:
+- a background image (based on the current playing song of the media_entity)
+- a background-color (based on the light status of the ```light_entity```)
+- 3 lines of text (Title, temperature of the ```climate_entity``` and value of the ```sensor_entity```)
 
+For each cell you can configure:
+- ```tap_action```
+- ```double_tab_action```
+- ```hold_action```
