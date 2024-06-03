@@ -20,9 +20,10 @@ The cells wil allways appear square. The appearance is highly configurable:
 
 The configuration-options of the card are as follows:
 
-**First example - entire house**
+**First example - entire house
+**
 Example of what you can achieve:
-<img width="927" alt="Scherm­afbeelding 2024-06-03 om 11 42 45" src="https://github.com/reiniertc/home_overview/assets/5908262/ec23fa00-bbd5-4ef5-82c4-795f8f9b7c57">
+<img width="600" alt="Scherm­afbeelding 2024-06-03 om 11 42 45" src="https://github.com/reiniertc/home_overview/assets/5908262/ec23fa00-bbd5-4ef5-82c4-795f8f9b7c57">
 
 Code used to configure the example:
 ```
