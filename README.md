@@ -190,4 +190,11 @@ cells:
 ```rows```: Number of rows to be displayed<br>
 ```columns```: Number of columns to be displayed<br>
 ```font-size```: Font-size (optional). 1 = normal size, 0.5 = 50% etc<br>
+```line-height```: Line spacing between the text lines<br>
+```corner-radius```: Radius of all corners of the cell<br>
+```transparency:``` Opacity of the background of the cell, as a percentage of the rgb color 200,200,200. Value must be between 0 and 1<br>
+```cell_spacing_vertical:``` spacing between rows in px<br>
+```cell_spacing_horizontal:``` spacing between rows in px<br>
+
 ## Configuration of a cell
+Configuration of the cells start with ```cells:```. Make sure that you configure the exact number of rows and colums that you defined.
