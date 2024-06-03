@@ -13,14 +13,14 @@ In every cell you can:
 
 The cells wil allways appear square. The appearance is highly configurable:
 - border-radius
-- opacity
+- opacity when light_entity is off
+- no background color when no title is provided
 - text size
-- vertical spacing
-- horizontal spacing
+- line-height
+- vertical spacing between cells
+- horizontal spacing between cells
 
-The configuration-options of the card are as follows:
-
-## First example - entire house
+# First example - entire house
 
 Example of what you can achieve:
 
@@ -36,7 +36,6 @@ font-size: 1.5
 line-height: 1.5
 corner-radius: 8px
 transparency: 0.2
-cell_spacing: 3px
 cell_spacing_vertical: 2px
 cell_spacing_horizontal: 3px
 cells:
