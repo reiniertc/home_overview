@@ -51,11 +51,11 @@ class HomeOverview extends HTMLElement {
     }
 
     const card = document.createElement('ha-card');
-
-    if (this.config.title) {
+    const title = this.config.title;
+    if (title) {
       const header = document.createElement('div');
-      header.classList.add('card-header');
-      header.textContent = this.config.title;
+      header.className = 'card-header';
+      header.innerText = title;
       card.appendChild(header);
     }
 
@@ -65,9 +65,9 @@ class HomeOverview extends HTMLElement {
     const table = document.createElement('div');
     table.style.display = 'grid';
     table.style.gridTemplateColumns = `repeat(${this.config.columns}, 1fr)`;
-    table.style.gridTemplateRows = `repeat(${this.config.rows}, 1fr)`;
-    table.style.gap = `${this.config.cell_spacing_vertical || '3px'} ${this.config.cell_spacing_horizontal || '3px'}`;
     table.style.width = '100%';
+    table.style.gridColumnGap = `${this.config.cell_spacing_horizontal}`;
+    table.style.gridRowGap = `${this.config.cell_spacing_vertical}`;
 
     const fontSize = this.config['font-size'] || 1;
     const lineHeight = this.config['line-height'] || '16px';
@@ -91,6 +91,7 @@ class HomeOverview extends HTMLElement {
 
         const cell = document.createElement('div');
         cell.style.border = '3px solid rgba(0,0,0,0)';
+        cell.style.padding = '8px';
         cell.style.width = '100%';
         cell.style.height = 0;
         cell.style.paddingBottom = '100%'; // Square cells by setting height to match width
@@ -101,17 +102,17 @@ class HomeOverview extends HTMLElement {
         cell.style.borderRadius = cornerRadius;
 
         if (title.toLowerCase() === 'none') {
-          if (lightEntityId && lightState === 'on') {
-            cell.style.backgroundColor = 'var(--primary-color)';
+          if (lightEntityId) {
+            cell.style.backgroundColor = lightState === 'on' ? 'var(--primary-color)' : `rgba(20,20,20,${transparency})`;
           } else {
             cell.style.backgroundColor = 'transparent';
           }
         } else if (lightState === 'on') {
           cell.style.backgroundColor = 'var(--primary-color)';
         } else if (!mediaPicture && lightState === 'off') {
-          cell.style.backgroundColor = `rgba(200,200,200,${transparency})`;
+          cell.style.backgroundColor = `rgba(20,20,20,${transparency})`;
         } else {
-          cell.style.backgroundColor = `rgba(200,200,200,${transparency})`;
+          cell.style.backgroundColor = `rgba(20,20,20,${transparency})`;
         }
 
         if (mediaState === 'playing' && mediaPicture) {
@@ -143,7 +144,7 @@ class HomeOverview extends HTMLElement {
         if (sensorEntityId && sensorState !== null) {
           cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; z-index: 1;">${sensorState}</div>`;
         } else {
-          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`; // Voeg een lege div toe om de hoogte consistent te houden
+          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`; // Add an empty div to maintain height consistency
         }
         cellContent.innerHTML = cellHTML;
 
@@ -190,4 +191,4 @@ class HomeOverview extends HTMLElement {
   }
 }
 
-customElements.define('home_overview', HomeOverview);
+customElements.define('home-overview', HomeOverview);
