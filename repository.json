@@ -1,0 +1,11 @@
+{
+  "name": "Home Overview",
+  "content_in_root": false,
+  "country": "NL",
+  "zip_release": false,
+  "homeassistant": "0.110.0",
+  "domains": [
+    "lovelace"
+  ],
+  "render_readme": true
+}
