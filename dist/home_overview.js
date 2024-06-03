@@ -110,9 +110,9 @@ class HomeOverview extends HTMLElement {
         } else if (lightState === 'on') {
           cell.style.backgroundColor = 'var(--primary-color)';
         } else if (!mediaPicture && lightState === 'off') {
-          cell.style.backgroundColor = `rgba(20,20,20,${transparency})`;
+          cell.style.backgroundColor = `rgba(200,200,200,${transparency})`;
         } else {
-          cell.style.backgroundColor = `rgba(20,20,20,${transparency})`;
+          cell.style.backgroundColor = `rgba(200,200,200,${transparency})`;
         }
 
         if (mediaState === 'playing' && mediaPicture) {
