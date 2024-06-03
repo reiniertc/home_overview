@@ -9,6 +9,7 @@ In every cell you can:
 - display the temperature on the second row
 - display the current playing song album art as a background
 - display the status of a sensor on the bottom row
+- assign a tap_action, hold_action and double_tap_action
 
 The cells wil allways appear square. The appearance is highly configurable:
 - border-radius
@@ -19,7 +20,7 @@ The cells wil allways appear square. The appearance is highly configurable:
 
 The configuration-options of the card are as follows:
 
-
+**First example - entire house**
 Example of what you can achieve:
 <img width="927" alt="Scherm­afbeelding 2024-06-03 om 11 42 45" src="https://github.com/reiniertc/home_overview/assets/5908262/ec23fa00-bbd5-4ef5-82c4-795f8f9b7c57">
 
