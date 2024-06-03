@@ -39,8 +39,7 @@ transparency: 0.2
 cell_spacing_vertical: 2px
 cell_spacing_horizontal: 3px
 cells:
-  - - title: none
-    - title: Bureau
+  - - title: Bureau
       light_entity: light.bureau
       climate_entity: climate.woonkamer
       media_entity: media_player.keuken_2
@@ -78,8 +77,7 @@ cells:
     - title: none
     - title: none
     - title: none
-  - - title: none
-    - title: Badkmr
+  - - title: Badkmr
       light_entity: light.badkamer
       climate_entity: climate.badkamer
       double_tap_action:
@@ -125,8 +123,7 @@ cells:
     - title: none
     - title: none
     - title: none
-  - - title: none
-    - title: Hal
+  - - title: Hal
       light_entity: light.dimmable_light_1
       climate_entity: none
       double_tap_action:
