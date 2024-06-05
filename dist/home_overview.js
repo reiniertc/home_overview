@@ -103,7 +103,7 @@ class HomeOverview extends HTMLElement {
 
         if (title.toLowerCase() === 'none') {
           if (lightEntityId) {
-            cell.style.backgroundColor = lightState === 'on' ? 'var(--primary-color)' : `rgba(200,200,200,${transparency})`;
+            cell.style.backgroundColor = lightState === 'on' ? 'var(--primary-color)' : `transparent`;
           } else {
             cell.style.backgroundColor = 'transparent';
           }
