@@ -103,7 +103,7 @@ class HomeOverview extends HTMLElement {
 
         if (title.toLowerCase() === 'none') {
           if (lightEntityId) {
-            cell.style.backgroundColor = lightState === 'on' ? 'var(--primary-color)' : `rgba(200,200,200,${transparency})`;
+            cell.style.backgroundColor = lightState === 'on' ? 'var(--primary-color)' : `rgba(20,20,20,${transparency})`;
           } else {
             cell.style.backgroundColor = 'transparent';
           }
@@ -139,3 +139,56 @@ class HomeOverview extends HTMLElement {
         if (climateEntityId && climateEntityId.toLowerCase() !== 'none' && climateState !== null) {
           cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; z-index: 1;">${climateState}&deg;</div>`;
         } else {
+          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`;  // Add an empty div to maintain height consistency
+        }
+        if (sensorEntityId && sensorState !== null) {
+          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; z-index: 1;">${sensorState}</div>`;
+        } else {
+          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`; // Add an empty div to maintain height consistency
+        }
+        cellContent.innerHTML = cellHTML;
+
+        cellContent.style.position = 'absolute';
+        cellContent.style.top = '50%';
+        cellContent.style.left = '50%';
+        cellContent.style.transform = 'translate(-50%, -50%)';
+        cellContent.style.width = '100%';
+        cellContent.style.height = '100%';
+        cellContent.style.display = 'flex';
+        cellContent.style.flexDirection = 'column';
+        cellContent.style.alignItems = 'center';
+        cellContent.style.justifyContent = 'center';
+        cellContent.style.boxSizing = 'border-box';
+        cellContent.style.padding = '1px';
+        cellContent.style.textAlign = 'center';
+
+        cell.appendChild(cellContent);
+        table.appendChild(cell);
+
+        // Add event listeners for tap, hold, and double-tap actions
+        if (cellConfig.tap_action) {
+          cell.addEventListener('click', () => this.handleAction(cellConfig.tap_action));
+        }
+        if (cellConfig.hold_action) {
+          cell.addEventListener('contextmenu', (ev) => {
+            ev.preventDefault();
+            this.handleAction(cellConfig.hold_action);
+          });
+        }
+        if (cellConfig.double_tap_action) {
+          cell.addEventListener('dblclick', () => this.handleAction(cellConfig.double_tap_action));
+        }
+      }
+    }
+
+    content.appendChild(table);
+    card.appendChild(content);
+    root.appendChild(card);
+  }
+
+  getCardSize() {
+    return 3;
+  }
+}
+
+customElements.define('home-overview', HomeOverview);
