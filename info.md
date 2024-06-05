@@ -43,7 +43,7 @@ Code used to configure the example:
 type: custom:reinier-custom-card
 title: null
 rows: 3
-columns: 9
+columns: 8
 font-size: 1.5
 line-height: 1.5
 corner-radius: 8px
