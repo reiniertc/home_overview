@@ -1,5 +1,6 @@
 # home_overview
-A complete overview of every room in your house in a single card in home assistant
+A complete overview of every room in your house in a single card in home assistant.
+
 
 This is a custom component with the goal of providing you an overview of you entire house in one card. 
 It allows you to define a table with a single or multiple columns and rows.
@@ -20,12 +21,7 @@ The cells wil allways appear square. The appearance is highly configurable:
 - vertical spacing between cells
 - horizontal spacing between cells
 
-# Installation
-
-1. Add this repository to HACS.
-2. Search for "Home Overview" and install.
-
-# example - show an entire house
+# First example - entire house
 
 Example of what you can achieve:
 
@@ -33,10 +29,10 @@ Example of what you can achieve:
 
 Code used to configure the example:
 ```yaml
-type: custom:reinier-custom-card
+type: custom:home-overview
 title: null
 rows: 3
-columns: 8
+columns: 9
 font-size: 1.5
 line-height: 1.5
 corner-radius: 8px
@@ -209,3 +205,7 @@ For each cell you can configure:
 - ```tap_action```
 - ```double_tab_action```
 - ```hold_action```
+
+## Good to know
+The ```media_entity``` is designed to work with Sonos speakers: it reads the attribute ```entity_picture``` where the url to the album art is at. I noticed that the album art has some delay, or isn't displayed at all times. Might be a caching issue of some sort.
+The ```climate_entity``` is designed to work with Honeywell Evohome, and is known to work with Tado aswell. It reads the attribute ```current_temperature```.
