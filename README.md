@@ -1,5 +1,6 @@
 # home_overview
-A complete overview of every room in your house in a single card in home assistant
+A complete overview of every room in your house in a single card in home assistant.
+
 
 This is a custom component with the goal of providing you an overview of you entire house in one card. 
 It allows you to define a table with a single or multiple columns and rows.
@@ -204,3 +205,7 @@ For each cell you can configure:
 - ```tap_action```
 - ```double_tab_action```
 - ```hold_action```
+
+## Good to know
+The ```media_entity``` is designed to work with Sonos speakers: it reads the attribute ```entity_picture``` where the url to the album art is at. I noticed that the album art has some delay, or isn't displayed at all times. Might be a caching issue of some sort.
+The ```climate_entity``` is designed to work with Honeywell Evohome, and is known to work with Tado aswell. It reads the attribute ```current_temperature```.
