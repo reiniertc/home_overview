@@ -46,20 +46,11 @@ class HomeOverview extends HTMLElement {
       return;
     }
 
-    // Create or reuse the card element
-    if (!this._card) {
-      this._card = document.createElement('ha-card');
-      root.appendChild(this._card);
+    while (root.lastChild) {
+      root.removeChild(root.lastChild);
     }
 
-    const card = this._card;
-
-    // Clear the card content
-    while (card.lastChild) {
-      card.removeChild(card.lastChild);
-    }
-
-    // Set card title if available
+    const card = document.createElement('ha-card');
     const title = this.config.title;
     if (title) {
       const header = document.createElement('div');
@@ -199,12 +190,12 @@ class HomeOverview extends HTMLElement {
 
     content.appendChild(table);
     card.appendChild(content);
+    root.appendChild(card);
   }
 
   getCardSize() {
     return 3;
   }
 }
-
 
 customElements.define('home-overview', HomeOverview);
