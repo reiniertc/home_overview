@@ -62,6 +62,11 @@ class HomeOverview extends HTMLElement {
     const content = document.createElement('div');
     content.style.padding = '16px';
 
+    // Check if card_background_color is set, if not, use theme's background color
+    const cardBackgroundColor = this.config.card_background_color || getComputedStyle(document.documentElement).getPropertyValue('--primary-background-color');
+
+    card.style.backgroundColor = cardBackgroundColor;
+
     const table = document.createElement('div');
     table.style.display = 'grid';
     table.style.gridTemplateColumns = `repeat(${this.config.columns}, 1fr)`;
