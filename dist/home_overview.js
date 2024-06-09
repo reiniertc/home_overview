@@ -46,16 +46,20 @@ class HomeOverview extends HTMLElement {
       return;
     }
 
+    // Create or reuse the card element
     if (!this._card) {
       this._card = document.createElement('ha-card');
       root.appendChild(this._card);
     }
 
     const card = this._card;
+
+    // Clear the card content
     while (card.lastChild) {
       card.removeChild(card.lastChild);
     }
 
+    // Set card title if available
     const title = this.config.title;
     if (title) {
       const header = document.createElement('div');
@@ -101,24 +105,17 @@ class HomeOverview extends HTMLElement {
         const mediaPicture = (mediaEntityId && this._hass.states[mediaEntityId]) ? this._hass.states[mediaEntityId].attributes.entity_picture : null;
         const sensorState = (sensorEntityId && this._hass.states[sensorEntityId]) ? this._hass.states[sensorEntityId].state : null;
 
-        let cell = table.querySelector(`.cell[data-row="${i}"][data-col="${j}"]`);
-        if (!cell) {
-          cell = document.createElement('div');
-          cell.classList.add('cell');
-          cell.dataset.row = i;
-          cell.dataset.col = j;
-          cell.style.border = '3px solid rgba(0,0,0,0)';
-          cell.style.padding = '8px';
-          cell.style.width = '100%';
-          cell.style.height = 0;
-          cell.style.paddingBottom = '100%'; // Square cells by setting height to match width
-          cell.style.boxSizing = 'border-box';
-          cell.style.overflow = 'hidden';
-          cell.style.textAlign = 'center';
-          cell.style.position = 'relative';
-          cell.style.borderRadius = cornerRadius;
-          table.appendChild(cell);
-        }
+        const cell = document.createElement('div');
+        cell.style.border = '3px solid rgba(0,0,0,0)';
+        cell.style.padding = '8px';
+        cell.style.width = '100%';
+        cell.style.height = 0;
+        cell.style.paddingBottom = '100%'; // Square cells by setting height to match width
+        cell.style.boxSizing = 'border-box';
+        cell.style.overflow = 'hidden';
+        cell.style.textAlign = 'center';
+        cell.style.position = 'relative';
+        cell.style.borderRadius = cornerRadius;
 
         if (title.toLowerCase() === 'none') {
           if (lightEntityId) {
@@ -134,46 +131,22 @@ class HomeOverview extends HTMLElement {
           cell.style.backgroundColor = `rgba(20,20,20,${transparency})`;
         }
 
-        let imageOverlay = cell.querySelector('.image-overlay');
         if (mediaState === 'playing' && mediaPicture) {
-          if (!imageOverlay) {
-            imageOverlay = document.createElement('div');
-            imageOverlay.classList.add('image-overlay');
-            imageOverlay.style.position = 'absolute';
-            imageOverlay.style.top = '0';
-            imageOverlay.style.left = '0';
-            imageOverlay.style.width = '100%';
-            imageOverlay.style.height = '100%';
-            cell.appendChild(imageOverlay);
-          }
+          const imageOverlay = document.createElement('div');
           imageOverlay.style.backgroundImage = `url(${mediaPicture})`;
           imageOverlay.style.backgroundSize = 'cover';
           imageOverlay.style.backgroundRepeat = 'no-repeat';
           imageOverlay.style.backgroundPosition = 'center';
           imageOverlay.style.opacity = 0.35;
-        } else if (imageOverlay) {
-          imageOverlay.remove();
+          imageOverlay.style.position = 'absolute';
+          imageOverlay.style.top = '0';
+          imageOverlay.style.left = '0';
+          imageOverlay.style.width = '100%';
+          imageOverlay.style.height = '100%';
+          cell.appendChild(imageOverlay);
         }
 
-        let cellContent = cell.querySelector('.cell-content');
-        if (!cellContent) {
-          cellContent = document.createElement('div');
-          cellContent.classList.add('cell-content');
-          cellContent.style.position = 'absolute';
-          cellContent.style.top = '50%';
-          cellContent.style.left = '50%';
-          cellContent.style.transform = 'translate(-50%, -50%)';
-          cellContent.style.width = '100%';
-          cellContent.style.height = '100%';
-          cellContent.style.display = 'flex';
-          cellContent.style.flexDirection = 'column';
-          cellContent.style.alignItems = 'center';
-          cellContent.style.justifyContent = 'center';
-          cellContent.style.boxSizing = 'border-box';
-          cellContent.style.padding = '1px';
-          cellContent.style.textAlign = 'center';
-          cell.appendChild(cellContent);
-        }
+        const cellContent = document.createElement('div');
 
         let cellHTML = '';
         if (title.toLowerCase() !== 'none') {
@@ -182,15 +155,31 @@ class HomeOverview extends HTMLElement {
         if (climateEntityId && climateEntityId.toLowerCase() !== 'none' && climateState !== null) {
           cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; z-index: 1;">${climateState}&deg;</div>`;
         } else {
-          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`;
+          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`;  // Add an empty div to maintain height consistency
         }
         if (sensorEntityId && sensorState !== null) {
           cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; z-index: 1;">${sensorState}</div>`;
         } else {
-          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`;
+          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`; // Add an empty div to maintain height consistency
         }
-
         cellContent.innerHTML = cellHTML;
+
+        cellContent.style.position = 'absolute';
+        cellContent.style.top = '50%';
+        cellContent.style.left = '50%';
+        cellContent.style.transform = 'translate(-50%, -50%)';
+        cellContent.style.width = '100%';
+        cellContent.style.height = '100%';
+        cellContent.style.display = 'flex';
+        cellContent.style.flexDirection = 'column';
+        cellContent.style.alignItems = 'center';
+        cellContent.style.justifyContent = 'center';
+        cellContent.style.boxSizing = 'border-box';
+        cellContent.style.padding = '1px';
+        cellContent.style.textAlign = 'center';
+
+        cell.appendChild(cellContent);
+        table.appendChild(cell);
 
         // Add event listeners for tap, hold, and double-tap actions
         if (cellConfig.tap_action) {
@@ -216,5 +205,6 @@ class HomeOverview extends HTMLElement {
     return 3;
   }
 }
+
 
 customElements.define('home-overview', HomeOverview);
