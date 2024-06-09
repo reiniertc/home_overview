@@ -62,11 +62,6 @@ class HomeOverview extends HTMLElement {
     const content = document.createElement('div');
     content.style.padding = '16px';
 
-    // Check if card_background_color is set, if not, use theme's background color
-    const cardBackgroundColor = this.config.card_background_color || getComputedStyle(document.documentElement).getPropertyValue('--primary-background-color');
-
-    card.style.backgroundColor = cardBackgroundColor;
-
     const table = document.createElement('div');
     table.style.display = 'grid';
     table.style.gridTemplateColumns = `repeat(${this.config.columns}, 1fr)`;
@@ -77,9 +72,7 @@ class HomeOverview extends HTMLElement {
     const fontSize = this.config['font-size'] || 1;
     const lineHeight = this.config['line-height'] || '16px';
     const cornerRadius = this.config['corner-radius'] || '5px';
-    const transparency = this.config['transparency'] || 0.2; // Default transparency is 20%
-
-    // Read vertical_correction from config and set default value to 1 (no scaling)
+    const defaultBackgroundColor = 'rgba(200,200,200,0.2)'; // Default background color
     const verticalCorrection = this.config.vertical_correction || 1;
 
     // Apply vertical scaling to the entire card
@@ -94,6 +87,7 @@ class HomeOverview extends HTMLElement {
         const mediaEntityId = cellConfig.media_entity;
         const sensorEntityId = cellConfig.sensor_entity;
         const title = cellConfig.title || 'none';
+        const cellBackgroundColor = cellConfig.cell_background_color || defaultBackgroundColor;
 
         const lightState = this._hass.states[lightEntityId] ? this._hass.states[lightEntityId].state : 'Unavailable';
         const climateState = (climateEntityId && this._hass.states[climateEntityId]) ? this._hass.states[climateEntityId].attributes.current_temperature : null;
@@ -115,16 +109,16 @@ class HomeOverview extends HTMLElement {
 
         if (title.toLowerCase() === 'none') {
           if (lightEntityId) {
-            cell.style.backgroundColor = lightState === 'on' ? 'var(--primary-color)' : `rgba(200,200,200,${transparency})`;
+            cell.style.backgroundColor = lightState === 'on' ? 'var(--primary-color)' : cellBackgroundColor;
           } else {
             cell.style.backgroundColor = 'transparent';
           }
         } else if (lightState === 'on') {
           cell.style.backgroundColor = 'var(--primary-color)';
         } else if (!mediaPicture && lightState === 'off') {
-          cell.style.backgroundColor = `rgba(200,200,200,${transparency})`;
+          cell.style.backgroundColor = cellBackgroundColor;
         } else {
-          cell.style.backgroundColor = `rgba(200,200,200,${transparency})`;
+          cell.style.backgroundColor = cellBackgroundColor;
         }
 
         if (mediaState === 'playing' && mediaPicture) {
