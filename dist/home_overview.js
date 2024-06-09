@@ -128,6 +128,9 @@ class HomeOverview extends HTMLElement {
     content.appendChild(table);
     card.appendChild(content);
     root.appendChild(card);
+
+    // Ensure the card is rendered and update the content
+    this.updateCard();
   }
 
   updateCard() {
