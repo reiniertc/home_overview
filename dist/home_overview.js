@@ -61,6 +61,10 @@ class HomeOverview extends HTMLElement {
 
     const content = document.createElement('div');
     content.style.padding = '16px';
+    
+    // Apply card background color
+    const cardBackgroundColor = this.config.card_background_color || 'var(--card-background-color, white)';
+    card.style.backgroundColor = cardBackgroundColor;
 
     const table = document.createElement('div');
     table.style.display = 'grid';
