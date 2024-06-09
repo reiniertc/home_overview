@@ -10,12 +10,12 @@ class HomeOverview extends HTMLElement {
     }
 
     this.config = config;
-    this.render();
+    this.createCard();
   }
 
   set hass(hass) {
     this._hass = hass;
-    this.render();
+    this.updateCard();
   }
 
   handleAction(actionConfig) {
@@ -36,7 +36,7 @@ class HomeOverview extends HTMLElement {
     }
   }
 
-  render() {
+  createCard() {
     if (!this.config || !this._hass) {
       return;
     }
@@ -51,6 +51,8 @@ class HomeOverview extends HTMLElement {
     }
 
     const card = document.createElement('ha-card');
+    card.id = 'home-overview-card';
+
     const title = this.config.title;
     if (title) {
       const header = document.createElement('div');
@@ -61,6 +63,7 @@ class HomeOverview extends HTMLElement {
 
     const content = document.createElement('div');
     content.style.padding = '16px';
+    content.id = 'content';
 
     const table = document.createElement('div');
     table.style.display = 'grid';
@@ -68,6 +71,7 @@ class HomeOverview extends HTMLElement {
     table.style.width = '100%';
     table.style.gridColumnGap = this.config.cell_spacing_horizontal || '5px';
     table.style.gridRowGap = this.config.cell_spacing_vertical || '5px';
+    table.id = 'table';
 
     const fontSize = this.config['font-size'] || 1;
     const lineHeight = this.config['line-height'] || '16px';
@@ -90,13 +94,10 @@ class HomeOverview extends HTMLElement {
         const sensorEntityId = cellConfig.sensor_entity;
         const title = cellConfig.title || 'none';
 
-        const lightState = this._hass.states[lightEntityId] ? this._hass.states[lightEntityId].state : 'Unavailable';
-        const climateState = (climateEntityId && this._hass.states[climateEntityId]) ? this._hass.states[climateEntityId].attributes.current_temperature : null;
-        const mediaState = (mediaEntityId && this._hass.states[mediaEntityId]) ? this._hass.states[mediaEntityId].state : null;
-        const mediaPicture = (mediaEntityId && this._hass.states[mediaEntityId]) ? this._hass.states[mediaEntityId].attributes.entity_picture : null;
-        const sensorState = (sensorEntityId && this._hass.states[sensorEntityId]) ? this._hass.states[sensorEntityId].state : null;
-
         const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.row = i;
+        cell.dataset.col = j;
         cell.style.border = '3px solid rgba(0,0,0,0)';
         cell.style.padding = '8px';
         cell.style.width = '100%';
@@ -107,6 +108,62 @@ class HomeOverview extends HTMLElement {
         cell.style.textAlign = 'center';
         cell.style.position = 'relative';
         cell.style.borderRadius = cornerRadius;
+
+        cell.innerHTML = `
+          <div class="cell-content" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; box-sizing: border-box; padding: 1px; text-align: center;">
+          </div>
+        `;
+
+        cell.addEventListener('click', () => this.handleAction(cellConfig.tap_action));
+        cell.addEventListener('contextmenu', (ev) => {
+          ev.preventDefault();
+          this.handleAction(cellConfig.hold_action);
+        });
+        cell.addEventListener('dblclick', () => this.handleAction(cellConfig.double_tap_action));
+
+        table.appendChild(cell);
+      }
+    }
+
+    content.appendChild(table);
+    card.appendChild(content);
+    root.appendChild(card);
+  }
+
+  updateCard() {
+    if (!this.config || !this._hass) {
+      return;
+    }
+
+    const root = this.shadowRoot;
+    if (!root) {
+      return;
+    }
+
+    const card = root.getElementById('home-overview-card');
+    const table = card.querySelector('#table');
+
+    const fontSize = this.config['font-size'] || 1;
+    const lineHeight = this.config['line-height'] || '16px';
+    const transparency = this.config['transparency'] || 0.2; // Default transparency is 20%
+
+    for (let i = 0; i < this.config.rows; i++) {
+      for (let j = 0; j < this.config.columns; j++) {
+        const cellConfig = (this.config.cells[i] && this.config.cells[i][j]) || {};
+        const lightEntityId = cellConfig.light_entity;
+        const climateEntityId = cellConfig.climate_entity;
+        const mediaEntityId = cellConfig.media_entity;
+        const sensorEntityId = cellConfig.sensor_entity;
+        const title = cellConfig.title || 'none';
+
+        const lightState = this._hass.states[lightEntityId] ? this._hass.states[lightEntityId].state : 'Unavailable';
+        const climateState = (climateEntityId && this._hass.states[climateEntityId]) ? this._hass.states[climateEntityId].attributes.current_temperature : null;
+        const mediaState = (mediaEntityId && this._hass.states[mediaEntityId]) ? this._hass.states[mediaEntityId].state : null;
+        const mediaPicture = (mediaEntityId && this._hass.states[mediaEntityId]) ? this._hass.states[mediaEntityId].attributes.entity_picture : null;
+        const sensorState = (sensorEntityId && this._hass.states[sensorEntityId]) ? this._hass.states[sensorEntityId].state : null;
+
+        const cell = table.querySelector(`.cell[data-row="${i}"][data-col="${j}"]`);
+        const cellContent = cell.querySelector('.cell-content');
 
         if (title.toLowerCase() === 'none') {
           if (lightEntityId) {
@@ -123,21 +180,28 @@ class HomeOverview extends HTMLElement {
         }
 
         if (mediaState === 'playing' && mediaPicture) {
-          const imageOverlay = document.createElement('div');
+          let imageOverlay = cell.querySelector('.image-overlay');
+          if (!imageOverlay) {
+            imageOverlay = document.createElement('div');
+            imageOverlay.className = 'image-overlay';
+            imageOverlay.style.position = 'absolute';
+            imageOverlay.style.top = '0';
+            imageOverlay.style.left = '0';
+            imageOverlay.style.width = '100%';
+            imageOverlay.style.height = '100%';
+            cell.appendChild(imageOverlay);
+          }
           imageOverlay.style.backgroundImage = `url(${mediaPicture})`;
           imageOverlay.style.backgroundSize = 'cover';
           imageOverlay.style.backgroundRepeat = 'no-repeat';
           imageOverlay.style.backgroundPosition = 'center';
           imageOverlay.style.opacity = 0.35;
-          imageOverlay.style.position = 'absolute';
-          imageOverlay.style.top = '0';
-          imageOverlay.style.left = '0';
-          imageOverlay.style.width = '100%';
-          imageOverlay.style.height = '100%';
-          cell.appendChild(imageOverlay);
+        } else {
+          const imageOverlay = cell.querySelector('.image-overlay');
+          if (imageOverlay) {
+            imageOverlay.remove();
+          }
         }
-
-        const cellContent = document.createElement('div');
 
         let cellHTML = '';
         if (title.toLowerCase() !== 'none') {
@@ -146,51 +210,17 @@ class HomeOverview extends HTMLElement {
         if (climateEntityId && climateEntityId.toLowerCase() !== 'none' && climateState !== null) {
           cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; z-index: 1;">${climateState}&deg;</div>`;
         } else {
-          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`;  // Add an empty div to maintain height consistency
+          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`;
         }
         if (sensorEntityId && sensorState !== null) {
           cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; z-index: 1;">${sensorState}</div>`;
         } else {
-          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`; // Add an empty div to maintain height consistency
+          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`;
         }
+
         cellContent.innerHTML = cellHTML;
-
-        cellContent.style.position = 'absolute';
-        cellContent.style.top = '50%';
-        cellContent.style.left = '50%';
-        cellContent.style.transform = 'translate(-50%, -50%)';
-        cellContent.style.width = '100%';
-        cellContent.style.height = '100%';
-        cellContent.style.display = 'flex';
-        cellContent.style.flexDirection = 'column';
-        cellContent.style.alignItems = 'center';
-        cellContent.style.justifyContent = 'center';
-        cellContent.style.boxSizing = 'border-box';
-        cellContent.style.padding = '1px';
-        cellContent.style.textAlign = 'center';
-
-        cell.appendChild(cellContent);
-        table.appendChild(cell);
-
-        // Add event listeners for tap, hold, and double-tap actions
-        if (cellConfig.tap_action) {
-          cell.addEventListener('click', () => this.handleAction(cellConfig.tap_action));
-        }
-        if (cellConfig.hold_action) {
-          cell.addEventListener('contextmenu', (ev) => {
-            ev.preventDefault();
-            this.handleAction(cellConfig.hold_action);
-          });
-        }
-        if (cellConfig.double_tap_action) {
-          cell.addEventListener('dblclick', () => this.handleAction(cellConfig.double_tap_action));
-        }
       }
     }
-
-    content.appendChild(table);
-    card.appendChild(content);
-    root.appendChild(card);
   }
 
   getCardSize() {
