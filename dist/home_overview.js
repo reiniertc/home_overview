@@ -74,6 +74,13 @@ class HomeOverview extends HTMLElement {
     const cornerRadius = this.config['corner-radius'] || '5px';
     const transparency = this.config['transparency'] || 0.2; // Default transparency is 20%
 
+    // Read vertical_correction from config and set default value to 1 (no scaling)
+    const verticalCorrection = this.config.vertical_correction || 1;
+
+    // Apply vertical scaling to the entire card
+    card.style.transform = `scaleY(${verticalCorrection})`;
+    card.style.transformOrigin = 'top';
+
     for (let i = 0; i < this.config.rows; i++) {
       for (let j = 0; j < this.config.columns; j++) {
         const cellConfig = (this.config.cells[i] && this.config.cells[i][j]) || {};
@@ -103,16 +110,16 @@ class HomeOverview extends HTMLElement {
 
         if (title.toLowerCase() === 'none') {
           if (lightEntityId) {
-            cell.style.backgroundColor = lightState === 'on' ? 'var(--primary-color)' : `transparent`;
+            cell.style.backgroundColor = lightState === 'on' ? 'var(--primary-color)' : `rgba(20,20,20,${transparency})`;
           } else {
             cell.style.backgroundColor = 'transparent';
           }
         } else if (lightState === 'on') {
           cell.style.backgroundColor = 'var(--primary-color)';
         } else if (!mediaPicture && lightState === 'off') {
-          cell.style.backgroundColor = `rgba(200,200,200,${transparency})`;
+          cell.style.backgroundColor = `rgba(20,20,20,${transparency})`;
         } else {
-          cell.style.backgroundColor = `rgba(200,200,200,${transparency})`;
+          cell.style.backgroundColor = `rgba(20,20,20,${transparency})`;
         }
 
         if (mediaState === 'playing' && mediaPicture) {
