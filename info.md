@@ -193,6 +193,7 @@ cells:
 ```transparency```: Opacity of the background of the cell, as a percentage of the rgb color 200,200,200. Value must be between 0 and 1<br>
 ```cell_spacing_vertical```: spacing between rows in px<br>
 ```cell_spacing_horizontal```: spacing between rows in px<br>
+```card_background_color```: backgroundcolor of the card in HEX, RGB or RGBA
 
 ## Configuration of a cell
 Configuration of the cells start with ```cells:```. Make sure that you configure the exact number of rows and colums that you defined.<br>
