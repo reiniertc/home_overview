@@ -33,6 +33,13 @@ class HomeOverview extends HTMLElement {
       const event = new Event('hass-more-info', { bubbles: true, composed: true });
       event.detail = { entityId: actionConfig.entity };
       this.dispatchEvent(event);
+    } else if (action === 'navigate') {
+      if (actionConfig.navigation_path) {
+        window.history.pushState(null, '', actionConfig.navigation_path);
+        window.dispatchEvent(new CustomEvent('location-changed'));
+      } else {
+        console.error("Navigation path not defined in actionConfig");
+      }
     }
   }
 
