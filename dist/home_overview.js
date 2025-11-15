@@ -32,15 +32,16 @@ class HomeOverview extends HTMLElement {
     this._content = document.createElement("div");
     this._content.style.padding = "16px";
 
+    this._gridWrapper = document.createElement("div");
+
     this._card.appendChild(this._header);
     this._card.appendChild(this._content);
+    this._content.appendChild(this._gridWrapper);
+
     root.appendChild(this._card);
 
     this._cells = [];
     this._cellConfigs = [];
-    this._gridWrapper = document.createElement("div");
-    this._content.appendChild(this._gridWrapper);
-
     this._renderScheduled = false;
   }
 
@@ -51,7 +52,6 @@ class HomeOverview extends HTMLElement {
 
     this.config = config;
 
-    // Titel beheren
     if (this.config.title) {
       this._header.textContent = this.config.title;
       this._header.style.display = "";
@@ -60,7 +60,6 @@ class HomeOverview extends HTMLElement {
       this._header.style.display = "none";
     }
 
-    // Achtergrondkleur van de kaart
     const cardBackgroundColor =
       this.config.card_background_color || "var(--card-background-color, white)";
     this._card.style.backgroundColor = cardBackgroundColor;
@@ -82,19 +81,15 @@ class HomeOverview extends HTMLElement {
   }
 
   handleAction(actionConfig) {
-    if (!actionConfig || !actionConfig.action) {
-      return;
-    }
+    if (!actionConfig || !actionConfig.action) return;
 
     const action = actionConfig.action;
 
     if (action === "call-service") {
       const [domain, service] = actionConfig.service.split(".");
-      this._hass
-        .callService(domain, service, actionConfig.service_data)
-        .catch((err) => {
-          console.error("Service call error:", err);
-        });
+      this._hass.callService(domain, service, actionConfig.service_data).catch((err) => {
+        console.error("Service call error:", err);
+      });
     } else if (action === "more-info") {
       const event = new Event("hass-more-info", { bubbles: true, composed: true });
       event.detail = { entityId: actionConfig.entity };
@@ -103,16 +98,27 @@ class HomeOverview extends HTMLElement {
       if (actionConfig.navigation_path) {
         window.history.pushState(null, "", actionConfig.navigation_path);
         window.dispatchEvent(new CustomEvent("location-changed"));
-      } else {
-        console.error("Navigation path not defined in actionConfig");
       }
     }
   }
 
-  _buildGrid() {
-    if (!this.config) return;
+  _applyContent(el, value) {
+    if (!value) {
+      el.textContent = "";
+      el.style.visibility = "hidden";
+      return;
+    }
 
-    // grid-wrapper leegmaken
+    el.style.visibility = "visible";
+
+    if (/[<&]/.test(value)) {
+      el.innerHTML = value;
+    } else {
+      el.textContent = value;
+    }
+  }
+
+  _buildGrid() {
     while (this._gridWrapper.firstChild) {
       this._gridWrapper.removeChild(this._gridWrapper.firstChild);
     }
@@ -189,7 +195,6 @@ class HomeOverview extends HTMLElement {
         cell.appendChild(cellContent);
         table.appendChild(cell);
 
-        // acties
         if (cellConfig.tap_action) {
           cell.addEventListener("click", () => this.handleAction(cellConfig.tap_action));
         }
@@ -200,9 +205,7 @@ class HomeOverview extends HTMLElement {
           });
         }
         if (cellConfig.double_tap_action) {
-          cell.addEventListener("dblclick", () =>
-            this.handleAction(cellConfig.double_tap_action)
-          );
+          cell.addEventListener("dblclick", () => this.handleAction(cellConfig.double_tap_action));
         }
 
         this._cells[i][j] = {
@@ -226,7 +229,6 @@ class HomeOverview extends HTMLElement {
     const defaultBackgroundColor = "rgba(200,200,200,0.2)";
     const verticalCorrection = this.config.vertical_correction || 1;
 
-    // schaal alleen de grid-wrapper, niet de hele kaart
     this._gridWrapper.style.transform = `scaleY(${verticalCorrection})`;
     this._gridWrapper.style.transformOrigin = "top";
 
@@ -241,7 +243,8 @@ class HomeOverview extends HTMLElement {
         const mediaEntityId = cellConfig.media_entity;
         const sensorEntityId = cellConfig.sensor_entity;
         const title = cellConfig.title || "none";
-        const cellBackgroundColor = cellConfig.cell_background_color || defaultBackgroundColor;
+        const cellBackgroundColor =
+          cellConfig.cell_background_color || defaultBackgroundColor;
 
         const lightState =
           lightEntityId && this._hass.states[lightEntityId]
@@ -268,7 +271,7 @@ class HomeOverview extends HTMLElement {
             ? this._hass.states[sensorEntityId].state
             : null;
 
-        // achtergrondkleur
+        // achtergrond
         if (title.toLowerCase() === "none") {
           if (lightEntityId) {
             refs.cell.style.backgroundColor =
@@ -290,7 +293,7 @@ class HomeOverview extends HTMLElement {
           refs.imageOverlay.style.display = "none";
         }
 
-        // tekst-styling
+        // styling
         refs.titleEl.style.fontSize = `${fontSize}em`;
         refs.titleEl.style.lineHeight = lineHeight;
         refs.climateEl.style.fontSize = `${fontSize}em`;
@@ -298,32 +301,24 @@ class HomeOverview extends HTMLElement {
         refs.sensorEl.style.fontSize = `${fontSize}em`;
         refs.sensorEl.style.lineHeight = lineHeight;
 
-        // titel
-        if (title.toLowerCase() !== "none") {
-          refs.titleEl.textContent = title;
-          refs.titleEl.style.visibility = "visible";
-        } else {
-          refs.titleEl.textContent = "";
-          refs.titleEl.style.visibility = "hidden";
-        }
+        // titel met HTML support
+        this._applyContent(refs.titleEl, title.toLowerCase() !== "none" ? title : "");
 
         // climate
-        if (climateEntityId && climateEntityId.toLowerCase() !== "none" && climateState != null) {
-          refs.climateEl.textContent = `${climateState}°`;
-          refs.climateEl.style.visibility = "visible";
-        } else {
-          refs.climateEl.textContent = "";
-          refs.climateEl.style.visibility = "hidden";
-        }
+        this._applyContent(
+          refs.climateEl,
+          climateEntityId &&
+            climateEntityId.toLowerCase() !== "none" &&
+            climateState != null
+            ? `${climateState}°`
+            : ""
+        );
 
         // sensor
-        if (sensorEntityId && sensorState != null) {
-          refs.sensorEl.textContent = sensorState;
-          refs.sensorEl.style.visibility = "visible";
-        } else {
-          refs.sensorEl.textContent = "";
-          refs.sensorEl.style.visibility = "hidden";
-        }
+        this._applyContent(
+          refs.sensorEl,
+          sensorEntityId && sensorState != null ? `${sensorState}` : ""
+        );
       }
     }
   }
