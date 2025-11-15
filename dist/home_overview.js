@@ -2,6 +2,31 @@ class HomeOverview extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+
+    // Basis DOM één keer opbouwen
+    const root = this.shadowRoot;
+
+    // Optioneel: eigen style voor font, zodat card-mod alleen een CSS-var hoeft te zetten
+    const style = document.createElement('style');
+    style.textContent = `
+      :host {
+        font-family: var(--home-overview-font, inherit);
+      }
+
+      ha-card {
+        font-family: inherit;
+      }
+    `;
+    root.appendChild(style);
+
+    this._card = document.createElement('ha-card');
+    this._content = document.createElement('div');
+    this._content.style.padding = '16px';
+
+    this._card.appendChild(this._content);
+    root.appendChild(this._card);
+
+    this._renderScheduled = false;
   }
 
   setConfig(config) {
@@ -10,12 +35,21 @@ class HomeOverview extends HTMLElement {
     }
 
     this.config = config;
+    // Bij nieuwe config direct renderen
     this.render();
   }
 
   set hass(hass) {
     this._hass = hass;
-    this.render();
+
+    // Debounce: maximaal 1 render per animation frame
+    if (this._renderScheduled) return;
+    this._renderScheduled = true;
+
+    window.requestAnimationFrame(() => {
+      this._renderScheduled = false;
+      this.render();
+    });
   }
 
   handleAction(actionConfig) {
@@ -44,32 +78,34 @@ class HomeOverview extends HTMLElement {
   }
 
   render() {
-    if (!this.config || !this._hass) {
+    if (!this.config || !this._hass || !this.shadowRoot) {
       return;
     }
 
-    const root = this.shadowRoot;
-    if (!root) {
-      return;
+    const card = this._card;
+    const content = this._content;
+
+    // Inhoud leegmaken, niet de hele shadowRoot
+    while (content.firstChild) {
+      content.removeChild(content.firstChild);
     }
 
-    while (root.lastChild) {
-      root.removeChild(root.lastChild);
-    }
-
-    const card = document.createElement('ha-card');
     const title = this.config.title;
+    // Header binnen de card zelf beheren
+    // Eerst bestaande header verwijderen als die er is
+    const existingHeader = card.querySelector('.card-header');
+    if (existingHeader) {
+      existingHeader.remove();
+    }
+
     if (title) {
       const header = document.createElement('div');
       header.className = 'card-header';
       header.innerText = title;
-      card.appendChild(header);
+      card.insertBefore(header, content);
     }
 
-    const content = document.createElement('div');
-    content.style.padding = '16px';
-    
-    // Apply card background color
+    // Achtergrondkleur van de kaart
     const cardBackgroundColor = this.config.card_background_color || 'var(--card-background-color, white)';
     card.style.backgroundColor = cardBackgroundColor;
 
@@ -86,7 +122,7 @@ class HomeOverview extends HTMLElement {
     const defaultBackgroundColor = 'rgba(200,200,200,0.2)'; // Default background color
     const verticalCorrection = this.config.vertical_correction || 1;
 
-    // Apply vertical scaling to the entire card
+    // Vertical scaling op de kaart
     card.style.transform = `scaleY(${verticalCorrection})`;
     card.style.transformOrigin = 'top';
 
@@ -111,7 +147,7 @@ class HomeOverview extends HTMLElement {
         cell.style.padding = '8px';
         cell.style.width = '100%';
         cell.style.height = 0;
-        cell.style.paddingBottom = '100%'; // Square cells by setting height to match width
+        cell.style.paddingBottom = '100%';
         cell.style.boxSizing = 'border-box';
         cell.style.overflow = 'hidden';
         cell.style.textAlign = 'center';
@@ -156,12 +192,12 @@ class HomeOverview extends HTMLElement {
         if (climateEntityId && climateEntityId.toLowerCase() !== 'none' && climateState !== null) {
           cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; z-index: 1;">${climateState}&deg;</div>`;
         } else {
-          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`;  // Add an empty div to maintain height consistency
+          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`;
         }
         if (sensorEntityId && sensorState !== null) {
           cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; z-index: 1;">${sensorState}</div>`;
         } else {
-          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`; // Add an empty div to maintain height consistency
+          cellHTML += `<div style="font-size: ${fontSize}em; line-height: ${lineHeight}; visibility: hidden;">&nbsp;</div>`;
         }
         cellContent.innerHTML = cellHTML;
 
@@ -182,7 +218,6 @@ class HomeOverview extends HTMLElement {
         cell.appendChild(cellContent);
         table.appendChild(cell);
 
-        // Add event listeners for tap, hold, and double-tap actions
         if (cellConfig.tap_action) {
           cell.addEventListener('click', () => this.handleAction(cellConfig.tap_action));
         }
@@ -199,8 +234,6 @@ class HomeOverview extends HTMLElement {
     }
 
     content.appendChild(table);
-    card.appendChild(content);
-    root.appendChild(card);
   }
 
   getCardSize() {
